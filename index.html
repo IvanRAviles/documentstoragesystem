@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login - Document System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#e63946">
+
+  <!-- Shared Styles -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="login-body">
+
+<div class="login-box">
+  <div id="network-status"></div>
+
+  <h2>Login</h2>
+
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Password">
+
+  <button id="loginButton" onclick="login()">Login</button>
+
+  <div id="debug-box">System Ready...</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+
+<script>
+/* ========= NETWORK STATUS ========= */
+function showOfflineWarning(reason) {
+  const statusBox = document.getElementById("network-status");
+
+  statusBox.style.display = "block";
+  statusBox.innerText =
+`OFFLINE / CONNECTION ISSUE
+------------------------
+${reason}
+
+The page may still load because of PWA caching, but login requires internet because authentication uses Supabase.`;
+}
+
+function hideOfflineWarning() {
+  const statusBox = document.getElementById("network-status");
+
+  statusBox.style.display = "none";
+  statusBox.innerText = "";
+}
+
+function checkBrowserNetworkStatus() {
+  if (!navigator.onLine) {
+    showOfflineWarning("Your browser reports that you are offline.");
+  } else {
+    hideOfflineWarning();
+  }
+}
+
+function isNetworkLikeError(error) {
+  const message = (error.message || "").toLowerCase();
+
+  return (
+    message.includes("failed to fetch") ||
+    message.includes("networkerror") ||
+    message.includes("network request failed") ||
+    message.includes("network") ||
+    message.includes("fetch") ||
+    message.includes("load failed") ||
+    message.includes("supabase library is not loaded") ||
+    message.includes("cannot reach supabase")
+  );
+}
+
+/* ========= REAL SUPABASE CONNECTION TEST ========= */
+async function canReachSupabase() {
+  try {
+    const controller = new AbortController();
+
+    const timeout = setTimeout(() => {
+      controller.abort();
+    }, 4000);
+
+    await fetch(SUPABASE_URL + "/rest/v1/", {
+      method: "GET",
+      cache: "no-store",
+      signal: controller.signal,
+      headers: {
+        "apikey": SUPABASE_ANON_KEY,
+        "Authorization": "Bearer " + SUPABASE_ANON_KEY
+      }
+    });
+
+    clearTimeout(timeout);
+
+    return true;
+
+  } catch (error) {
+    return false;
+  }
+}
+
+window.addEventListener("online", () => {
+  hideOfflineWarning();
+});
+
+window.addEventListener("offline", () => {
+  showOfflineWarning("Your browser reports that you are offline.");
+});
+
+/* ========= DEBUG SYSTEM ========= */
+function showLoginError(error, context, forceConnectionWarning = false) {
+  console.error(error);
+
+  const message = error.message || "Unknown error";
+
+  let fixText = `
+Possible Fix:
+- Check email/password
+- Check internet connection
+- Check Supabase URL
+- Check Supabase anon key
+`;
+
+  if (forceConnectionWarning || isNetworkLikeError(error)) {
+    showOfflineWarning("The app tried to reach Supabase but the connection failed.");
+
+    fixText = `
+Possible Fix:
+- Your internet may be disconnected
+- Wi-Fi may be off
+- Supabase may be unreachable
+- Reconnect internet and try again
+`;
+  }
+
+  document.getElementById("debug-box").innerText = `
+ERROR DETECTED
+------------------------
+Where: ${context}
+Message: ${message}
+${fixText}`;
+}
+
+function reportSuccess(message) {
+  hideOfflineWarning();
+  document.getElementById("debug-box").innerText = message;
+}
+
+/* ========= LOGIN ========= */
+async function login() {
+  try {
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+
+    if (!email || !password) {
+      throw new Error("Missing email or password");
+    }
+
+    if (!navigator.onLine) {
+      showOfflineWarning("Your browser reports that you are offline.");
+      throw new Error("You are offline. Login requires internet.");
+    }
+
+    const reachable = await canReachSupabase();
+
+    if (!reachable) {
+      throw new Error("Cannot reach Supabase. Login requires internet.");
+    }
+
+    const client = getSupabaseClient();
+
+    const { error } = await client.auth.signInWithPassword({
+      email: email,
+      password: password
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    reportSuccess("Login successful. Redirecting...");
+
+    setTimeout(() => {
+      window.location.href = "dashboard.html";
+    }, 800);
+
+  } catch (error) {
+    if (isNetworkLikeError(error)) {
+      showLoginError(error, "User Login", true);
+      return;
+    }
+
+    showLoginError(error, "User Login", false);
+  }
+}
+
+/* ========= PWA SERVICE WORKER ========= */
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("service-worker.js")
+      .then(() => {
+        console.log("Service worker registered.");
+      })
+      .catch((error) => {
+        console.error("Service worker registration failed:", error);
+      });
+  });
+}
+
+/* ========= INIT ========= */
+checkBrowserNetworkStatus();
+
+window.addEventListener("load", () => {
+  try {
+    getSupabaseClient();
+  } catch (error) {
+    if (!navigator.onLine || isNetworkLikeError(error)) {
+      showOfflineWarning("Supabase could not load. Login requires internet.");
+    }
+  }
+});
+</script>
+
+</body>
+</html>
