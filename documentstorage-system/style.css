@@ -1,0 +1,221 @@
+/* ========= GLOBAL ========= */
+
+body {
+  background: #0f0f0f;
+  color: white;
+  font-family: Arial, sans-serif;
+  margin: 0;
+}
+
+h2 {
+  margin-top: 0;
+}
+
+button {
+  margin-top: 10px;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  background: #e63946;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #c92f3b;
+}
+
+button:disabled {
+  background: #555;
+  cursor: not-allowed;
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  box-sizing: border-box;
+  background: #ffffff;
+  color: #111111;
+  font-size: 14px;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: 2px solid #e63946;
+}
+
+textarea {
+  height: 150px;
+  resize: vertical;
+}
+
+select {
+  cursor: pointer;
+}
+
+a {
+  color: #00ff88;
+  display: inline-block;
+  margin-top: 10px;
+}
+
+/* ========= BUTTON TYPES ========= */
+
+.secondary-button,
+.secondary {
+  background: #333;
+}
+
+.secondary-button:hover,
+.secondary:hover {
+  background: #444;
+}
+
+.danger-button,
+.danger {
+  background: #8b0000;
+}
+
+.danger-button:hover,
+.danger:hover {
+  background: #a60000;
+}
+
+/* ========= LOGIN PAGE ========= */
+
+.login-body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.login-box {
+  background: #1a1a1a;
+  padding: 20px;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 320px;
+}
+
+/* ========= APP PAGE LAYOUT ========= */
+
+.app-body {
+  padding: 20px;
+}
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+}
+
+.top-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ========= NETWORK / DEBUG ========= */
+
+#network-status {
+  display: none;
+  margin-bottom: 15px;
+  padding: 10px;
+  border-radius: 5px;
+  background: #2b1b00;
+  color: #ffcc66;
+  font-size: 13px;
+  white-space: pre-wrap;
+}
+
+#debug-box {
+  margin-top: 20px;
+  background: black;
+  color: #00ff88;
+  padding: 10px;
+  font-size: 12px;
+  min-height: 60px;
+  white-space: pre-wrap;
+  border-radius: 5px;
+}
+
+#status {
+  margin-top: 15px;
+  color: #00ff88;
+  font-size: 14px;
+  white-space: pre-wrap;
+}
+
+/* ========= DASHBOARD ========= */
+
+#categoryInput {
+  margin-bottom: 0;
+}
+
+#categoryFilter {
+  margin-top: 10px;
+}
+
+#dropZone {
+  margin-top: 10px;
+  padding: 20px;
+  border: 2px dashed #555;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 5px;
+  background: #1a1a1a;
+  color: white;
+}
+
+#documents {
+  margin-top: 20px;
+}
+
+.doc {
+  background: #1a1a1a;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 5px;
+  word-wrap: break-word;
+}
+
+/* ========= ADMIN PANEL ========= */
+
+#adminControls {
+  display: none;
+}
+
+#logs {
+  margin-top: 20px;
+}
+
+.log {
+  background: #1a1a1a;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 5px;
+  border-left: 4px solid #e63946;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-size: 13px;
+}
+
+.empty {
+  background: black;
+  color: #00ff88;
+  padding: 15px;
+  margin-top: 20px;
+  border-radius: 5px;
+}
